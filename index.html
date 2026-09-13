@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You're Invited</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Marcellus&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- envolop open -->
+<div id="doors" class="door-wrapper">
+  <video muted playsinline id="door-video">
+    <source src="video/envelope.mp4" type="video/mp4">
+  </video> 
+  
+  <div class="door-overlay">
+    <div class="door-hint">✦ TAP TO OPEN ✦</div>
+  </div>
+</div>
+
+<!-- MUSIC -->
+<button class="music" id="musicBtn" aria-label="Toggle music">♪</button>
+<audio id="audio" preload="auto" loop playsinline>
+  <source src="./music/fairytale.mp3" type="audio/mpeg">
+</audio>
+
+<!-- HERO -->
+<section class="hero">
+  <video autoplay muted loop playsinline id="hero-bg-video">
+    <source src="video/curtains-bg.mp4" type="video/mp4">
+  </video>
+
+  <div class="hero-content">
+    <!-- 1. Bismillah Arabic (White Color) -->
+    <div class="bismillah-arabic" style="font-size: 1.8rem; margin-bottom: 0.2rem; font-family: 'Amiri', 'Traditional Arabic', serif; color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+      بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
+    </div>
+
+    <!-- 2. English Translation (White Color) -->
+    <div class="bismillah-english" style="font-size: 0.75rem; letter-spacing: 1.5px; opacity: 0.9; margin-bottom: 1.2rem; text-transform: uppercase; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">
+      In the name of Allah, the Most Gracious, the Most Merciful
+    </div>
+
+    <!-- 3. Custom Quote -->
+    <p class="tag" style="max-width: 480px; margin: 1rem auto 0 auto; line-height: 1.5; text-transform: none; font-style: italic;">
+      A beautiful chapter of our lives is about to begin, and we would be honored to have you with us.
+    </p>
+
+
+
+
+    <!-- Names Section -->
+    <h1 class="names">
+      <span class="first-name">Abdul Wasay</span>
+      <span class="amp">&amp;</span>
+      <span class="second-name">Hadiqa</span>
+    </h1>
+
+
+  </div>
+
+  <div class="scroll-cue">
+  <span>SCROLL DOWN</span>
+  <span class="arrow">↓</span>
+</div>
+</section>
+<!-- STORY -->
+<section class="block host-invitation-block">
+  <div class="hosts-container">
+    <h3 class="host-name">Mr. &amp; Mrs. Khalid Masood</h3>
+    <p class="family-tag">ALONG WITH</p>
+    <h3 class="host-name">Mr. &amp; Mrs. Sabir Khan</h3>
+  </div>
+
+  <p class="family-tag">And Together With Their Families</p>
+
+  <h2 class="invite-heading">Invites You</h2>
+  <p class="invite-subheading">TO JOIN US</p>
+
+  <div class="invite-details">
+    <p class="ceremony-text">for the Nikkah and Valima ceremony</p>
+    <p class="ceremony-text">of our beloved Son & Daughter</p>
+    
+    <p class="quote-text">We would be honoured to have you witness</p>
+    <p class="ceremony-text">the moment they say</p>
+    <div class="qabool-text">"Qabool Hai"</div>
+  </div>
+</section>
+
+<!-- SCRATCH / SAVE THE DATE SECTION -->
+<section class="block">
+  <div class="eyebrow">SAVE THE DATE</div>
+  <h2 style="font-family: 'Playfair Display', serif !important; font-style: italic !important; font-weight: 600 !important; color: #7a4b56 !important;">
+  Scratch to Reveal
+  </h2>
+  <div class="divider"></div>
+
+  <div class="scratch-wrap">
+    <div class="scratch-under">
+      <div class="event-block">
+        <div class="event-title">NIKKAH & RUKHSATI</div>
+        <div class="d-date">29 January 2027</div>
+      </div>
+      
+      <div class="event-divider"></div>
+
+      <div class="event-block">
+        <div class="event-title">RECEPTION</div>
+        <div class="d-date">31 January 2027</div>
+      </div>
+    </div>
+    
+    <!-- Scratch Cover Canvas -->
+    <canvas id="scratch"></canvas>
+  </div>
+</section>
+
+<!-- COUNTDOWN -->
+<section class="block">
+  <div class="eyebrow">THE MOMENT APPROACHES</div>
+  <h2 style="font-family: 'Playfair Display', serif !important; font-style: italic !important; font-weight: 600 !important; color: #7a4b56 !important;">
+  Nikkah Countdown
+  </h2>
+  <div class="countdown" id="countdown">
+    <div class="cd-cell"><div class="cd-num" id="dd">00</div><div class="cd-lab">DAYS</div></div>
+    <div class="cd-cell"><div class="cd-num" id="hh">00</div><div class="cd-lab">HOURS</div></div>
+    <div class="cd-cell"><div class="cd-num" id="mm">00</div><div class="cd-lab">MINUTES</div></div>
+    <div class="cd-cell"><div class="cd-num" id="ss">00</div><div class="cd-lab">SECONDS</div></div>
+  </div>
+</section>
+
+<!-- SLIDESHOW -->
+<section class="block">
+  <div class="eyebrow">OUR JOURNEY</div>
+  <h2 style="font-family: 'Playfair Display', serif !important; font-style: italic !important; font-weight: 600 !important; color: #7a4b56 !important;">
+  Moments We Cherish
+  </h2>
+  <div class="slideshow" id="slideshow">
+    <div class="slide active" style="background-image:url('https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1200&q=80')"></div>
+    <div class="slide" style="background-image:url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1200&q=80')"></div>
+    <div class="slide" style="background-image:url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=80')"></div>
+  </div>
+</section>
+
+<!-- DETAILS -->
+<section class="block">
+  <h2 style="font-family: 'Playfair Display', serif !important; font-style: italic !important; font-weight: 600 !important; color: #7a4b56 !important;">
+  Nikkah &amp; Rukhsati
+</h2>
+  <p style="margin-bottom: 20px;">
+  <span style="color: #2c2c2c !important; font-family: 'Cinzel', serif !important; font-style: normal !important; font-size: 0.85rem !important; font-weight: 400 !important; letter-spacing: 0.35em !important; text-transform: uppercase !important;">
+    WHEN &amp; WHERE
+  </span>
+</p>
+  <div class="facts">
+    <div class="fact"><div class="t">NIKKAH</div><div class="v">7:00 PM</div><div class="s">Grand lawn, arrival by 6:30</div></div>
+    <div class="fact"><div class="t">DINNER</div><div class="v">9:00 PM</div><div class="s">Banquet hall, dinner</div></div>
+    <div class="fact"><div class="t">RUKHSATI</div><div class="v">10:00PM</div><div class="s">With warm wishes & prayers</div></div>
+    <div class="fact"><div class="t">VENUE</div><div class="v">To Be Announced</div><div class="s">Location details updating soon</div></div>
+  </div>
+  <div class="map-frame">
+    <iframe src="https://www.google.com/maps?q=Eiffel+Tower&output=embed" loading="lazy" title="Venue map"></iframe>
+  </div>
+</section>
+
+<!-- WALIMA RECEPTION SECTION -->
+<section class="block">
+  <h2 style="font-family: 'Playfair Display', serif !important; font-style: italic !important; font-weight: 600 !important; color: #7a4b56 !important;">
+  Walima Reception
+  </h2>
+ <p style="margin-bottom: 20px;">
+  <span style="color: #2c2c2c !important; font-family: 'Cinzel', serif !important; font-style: normal !important; font-size: 0.85rem !important; font-weight: 400 !important; letter-spacing: 0.35em !important; text-transform: uppercase !important;">
+    WHEN &amp; WHERE
+  </span>
+</p>
+  <div class="facts">
+    <div class="fact"><div class="t">RECEPTION</div><div class="v">1:00 PM</div><div class="s">Guest arrival &amp; welcome</div></div>
+    <div class="fact"><div class="t">LUNCH</div><div class="v">3:30 PM</div><div class="s">Grand lunch served</div></div>
+    <div class="fact"><div class="t">VENUE</div><div class="v">To Be Announced</div><div class="s">Location details updating soon</div></div>
+  </div>
+  <div class="map-frame">
+    <iframe src="https://www.google.com/maps?q=Karachi&amp;output=embed" loading="lazy" title="Venue map"></iframe>
+  </div>
+</section>
+
+<footer>
+  <div class="fnames">We can't wait to celebrate with you.</div>
+  <div>Digital Invitation by: name</div>
+</footer>
+
+<script src="music.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
