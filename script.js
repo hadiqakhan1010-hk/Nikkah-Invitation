@@ -3,8 +3,9 @@
 =================================================== */
 const EVENT_DATE = new Date("2027-01-29T18:00:00").getTime();
 
+
 /* ===================================================
-   2. DOOR REVEAL LOGIC
+   2. DOOR REVEAL LOGIC (FIXED FOR LIVE SERVER AUDIO)
 =================================================== */
 function initDoorReveal() {
   const doors = document.getElementById('doors');
@@ -15,29 +16,43 @@ function initDoorReveal() {
 
   let isOpened = false;
 
+  function startAudio() {
+    if (!audio) return;
+    audio.muted = false; // Ensure unmuted state
+    audio.play().then(() => {
+      const btn = document.getElementById('musicBtn');
+      if (btn) {
+        btn.textContent = '♪';
+        btn.style.opacity = '1';
+      }
+    }).catch(err => {
+      console.log("Audio Direct Play Error:", err);
+    
+      // Try again on the visitor's next tap. click and touchend count as
+      // user gestures for media playback; touchstart does not.
+      const retryAudio = () => {
+        document.removeEventListener('click', retryAudio);
+        document.removeEventListener('touchend', retryAudio);
+        audio.play().catch(() => {});
+      };
+      document.addEventListener('click', retryAudio);
+      document.addEventListener('touchend', retryAudio);
+    });
+  }
+
   function triggerOpen() {
     if (isOpened) return;
     isOpened = true;
 
-    // Direct audio play on user click (Browser bypass)
-    if (audio) {
-
-      audio.play().then(() => {
-        const btn = document.getElementById('musicBtn');
-        if (btn) {
-          btn.textContent = '♪';
-          btn.style.opacity = '1';
-        }
-      }).catch(err => {
-        console.log("Audio Direct Play Error:", err);
-      });
-    }
+    // 1. Immediate Audio Trigger on Direct User Gesture
+    startAudio();
 
     const hint = doors.querySelector('.door-overlay');
     if (hint) hint.style.opacity = '0';
 
     if (doorVideo) {
-      doorVideo.muted = true;
+      doorVideo.muted = true; 
+      doorVideo.setAttribute('playsinline', '');
       
       const playPromise = doorVideo.play();
       if (playPromise !== undefined) {
@@ -62,11 +77,15 @@ function initDoorReveal() {
     }
   }
 
+  // click only: a tap on a phone still fires click. A touchstart listener
+  // would run first, but touchstart is not a user gesture for media, so
+  // audio.play() gets rejected there -- and the isOpened guard then stops
+  // the real click from starting the music.
   doors.addEventListener('click', triggerOpen);
-  doors.addEventListener('touchstart', triggerOpen, { passive: true });
 }
+
 /* ===================================================
-   3. SCRATCH CARD FEATURE (SOFT ROSE GOLD GRADIENT FIX)
+   3. SCRATCH CARD FEATURE
 =================================================== */
 function initScratchCard() {
   const canvas = document.getElementById('scratch');
@@ -78,41 +97,22 @@ function initScratchCard() {
   let scratching = false;
   let cleared = false;
 
-  function setupCanvas() {
-    if (cleared) return;
+  canvas.width = wrap.offsetWidth || 320;
+  canvas.height = wrap.offsetHeight || 200;
 
-    const width = wrap.clientWidth || 260;
-    const height = wrap.clientHeight || 125;
+  const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  gradient.addColorStop(0, '#E8B4B8');
+  gradient.addColorStop(0.5, '#F3D2D5');
+  gradient.addColorStop(1, '#D89A9F');
 
-    canvas.width = width;
-    canvas.height = height;
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Exact Soft Rose Gold Gradient (Horizontal Left-to-Right)
-    const gradient = ctx.createLinearGradient(0, 0, width, 0);
-    gradient.addColorStop(0, '#E8B4B8');    // Soft Rose Gold Top/Left
-    gradient.addColorStop(0.35, '#F3D2D5'); // Light Shimmer Center
-    gradient.addColorStop(0.7, '#E8B4B8');  // Rose Gold
-    gradient.addColorStop(1, '#D89A9F');    // Slight Depth Edge (No dark patches)
-
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, width, height);
-
-    // Scratch Text Overlay
-    ctx.fillStyle = '#6E2D36';
-    ctx.font = '600 12px "Cinzel", serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('✶ SCRATCH HERE ✶', width / 2, height / 2);
-  }
-
-  setupCanvas();
-
-  if (window.ResizeObserver) {
-    const ro = new ResizeObserver(() => {
-      if (!scratching && !cleared) setupCanvas();
-    });
-    ro.observe(wrap);
-  }
+  ctx.fillStyle = '#6E2D36';
+  ctx.font = '600 13px "Cinzel", serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('✶ SCRATCH HERE ✶', canvas.width / 2, canvas.height / 2);
 
   function scratch(e) {
     if (!scratching || cleared) return;
@@ -122,7 +122,7 @@ function initScratchCard() {
 
     ctx.globalCompositeOperation = 'destination-out';
     ctx.beginPath();
-    ctx.arc(x, y, 20, 0, Math.PI * 2);
+    ctx.arc(x, y, 22, 0, Math.PI * 2);
     ctx.fill();
 
     checkCleared();
@@ -135,7 +135,7 @@ function initScratchCard() {
     for (let i = 3; i < pixelData.length; i += 32) {
       if (pixelData[i] === 0) transparent++;
     }
-    if (transparent / (pixelData.length / 32) > 0.45) {
+    if (transparent / (pixelData.length / 32) > 0.5) {
       cleared = true;
       canvas.style.transition = 'opacity 0.8s ease';
       canvas.style.opacity = '0';
@@ -153,6 +153,7 @@ function initScratchCard() {
     if (scratching) { e.preventDefault(); scratch(e); }
   }, { passive: false });
 }
+
 
 /* ===================================================
    4. COUNTDOWN TIMER
