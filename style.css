@@ -15,7 +15,7 @@ html{scroll-behavior:smooth}
 body{
   font-family:'Cormorant Garamond',serif;
   color:var(--ink);
-  background:var(--cream);
+  background:#faf6f0 !important;
   overflow-x:hidden;
 }
 h1,h2,h3,.marcellus{font-family:'Marcellus',serif;font-weight:400}
@@ -322,70 +322,63 @@ section.block::before {
   color: var(--rose-dark, #8A404B);
   margin-top: 4px;
 }
-/* ---------- SCRATCH CARD STYLING ---------- */
+/* ---------- SCRATCH CARD STYLING (EXACT SIZE & SHAPE) ---------- */
 .scratch-wrap {
   display: block;
   position: relative;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(232, 180, 184, 0.3);
-  margin: 1.5rem auto 0 auto; /* 'auto' centers block elements horizontally */
-  width: clamp(280px, 85vw, 340px);
-  max-width: 100%;
+  box-shadow: 0 4px 15px rgba(122, 75, 86, 0.15);
+  margin: 1.25rem auto 0.5rem auto; /* Horizontally centered */
+  width: 260px;                     /* Exact compact width */
+  height: 125px;                    /* Compact height */
+  box-sizing: border-box;
 }
 
 .scratch-under {
   width: 100%;
-  padding: 1.8rem 1.25rem; /* Balanced padding for clean mobile layout */
-  background: linear-gradient(135deg, #FAF6F0 0%, #E8B4B8 100%);
-  color: var(--ink);
+  height: 100%;
+  background: linear-gradient(135deg, #fff0f3 0%, #f7d6dc 50%, #e8b4b8 100%);
+  color: #2c2c2c;
   text-align: center;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  border-radius: 12px;
 }
 
 .event-title {
-  font-family: 'Marcellus', serif;
-  font-size: clamp(0.75rem, 2.5vw, 0.85rem);
-  letter-spacing: 0.18em;
-  color: var(--rose-dark);
-  font-weight: 600;
-  margin-bottom: 0.2rem;
+  font-family: 'Cinzel', serif !important;
+  font-size: 0.8rem !important;
+  letter-spacing: 0.15em !important;
+  color: #7a4b56 !important;
+  font-weight: 700 !important;
+  margin-bottom: 4px;
+  text-transform: uppercase;
 }
 
 .scratch-under .d-date {
-  font-family: 'Marcellus', serif;
-  font-size: clamp(1.25rem, 4vw, 1.5rem);
-  color: #3A2628;
-  font-weight: 500;
-}
-
-.scratch-under .d-time {
-  font-size: clamp(0.9rem, 3vw, 1.05rem);
-  color: var(--text-muted);
-  margin-top: 0.2rem;
-}
-
-.event-divider {
-  width: 40px;
-  height: 1px;
-  background: rgba(201, 138, 144, 0.4);
-  margin: 0.8rem auto;
+  font-family: 'Playfair Display', serif !important;
+  font-size: 1.15rem !important;
+  color: #2c2c2c !important;
+  font-weight: 700 !important;
+  margin: 0;
 }
 
 #scratch {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
   z-index: 5;
   cursor: grab;
-  touch-action: none; /* Prevents touch scrolling on mobile while scratching */
+  touch-action: none;
+  border-radius: 12px;
 }
-
-#scratch:active {
-  cursor: grabbing;
-}
-
 /* ---------- SLIDESHOW ---------- */
 .slideshow{position:relative;max-width:640px;margin:1.5rem auto 0;aspect-ratio:3/2;
   border-radius:14px;overflow:hidden;box-shadow:0 14px 40px rgba(232,180,184,.25)}

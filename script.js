@@ -4,36 +4,41 @@
 const EVENT_DATE = new Date("2027-01-29T18:00:00").getTime();
 
 /* ===================================================
-   2. DOOR REVEAL LOGIC (FIXED WITH MUSIC.JS INTEGRATION)
+   2. DOOR REVEAL LOGIC
 =================================================== */
 function initDoorReveal() {
   const doors = document.getElementById('doors');
   const doorVideo = document.getElementById('door-video');
+  const audio = document.getElementById('audio');
 
   if (!doors) return;
 
   let isOpened = false;
 
-  function triggerOpen(e) {
+  function triggerOpen() {
     if (isOpened) return;
     isOpened = true;
 
-    // 1. Trigger Music.js module on Direct User Gesture (Mobile Fix)
-    if (typeof Music !== 'undefined') {
-      Music.start();
+    // Direct audio play on user click (Browser bypass)
+    if (audio) {
+
+      audio.play().then(() => {
+        const btn = document.getElementById('musicBtn');
+        if (btn) {
+          btn.textContent = '♪';
+          btn.style.opacity = '1';
+        }
+      }).catch(err => {
+        console.log("Audio Direct Play Error:", err);
+      });
     }
 
-    // 2. Hide Hint Overlay
     const hint = doors.querySelector('.door-overlay');
     if (hint) hint.style.opacity = '0';
 
-    // 3. Play Video (Muted to ensure audio doesn't get blocked)
     if (doorVideo) {
       doorVideo.muted = true;
-      doorVideo.playsInline = true; 
-      doorVideo.setAttribute('playsinline', '');
-      doorVideo.setAttribute('webkit-playsinline', '');
-
+      
       const playPromise = doorVideo.play();
       if (playPromise !== undefined) {
         playPromise.then(() => {
@@ -57,11 +62,11 @@ function initDoorReveal() {
     }
   }
 
-  // Dual listener fix for Mobile
   doors.addEventListener('click', triggerOpen);
+  doors.addEventListener('touchstart', triggerOpen, { passive: true });
 }
 /* ===================================================
-   3. SCRATCH CARD FEATURE
+   3. SCRATCH CARD FEATURE (SOFT ROSE GOLD GRADIENT FIX)
 =================================================== */
 function initScratchCard() {
   const canvas = document.getElementById('scratch');
@@ -73,22 +78,41 @@ function initScratchCard() {
   let scratching = false;
   let cleared = false;
 
-  canvas.width = wrap.offsetWidth || 320;
-  canvas.height = wrap.offsetHeight || 200;
+  function setupCanvas() {
+    if (cleared) return;
 
-  const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-  gradient.addColorStop(0, '#E8B4B8');
-  gradient.addColorStop(0.5, '#F3D2D5');
-  gradient.addColorStop(1, '#D89A9F');
+    const width = wrap.clientWidth || 260;
+    const height = wrap.clientHeight || 125;
 
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+    canvas.width = width;
+    canvas.height = height;
 
-  ctx.fillStyle = '#6E2D36';
-  ctx.font = '600 13px "Cinzel", serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('✶ SCRATCH HERE ✶', canvas.width / 2, canvas.height / 2);
+    // Exact Soft Rose Gold Gradient (Horizontal Left-to-Right)
+    const gradient = ctx.createLinearGradient(0, 0, width, 0);
+    gradient.addColorStop(0, '#E8B4B8');    // Soft Rose Gold Top/Left
+    gradient.addColorStop(0.35, '#F3D2D5'); // Light Shimmer Center
+    gradient.addColorStop(0.7, '#E8B4B8');  // Rose Gold
+    gradient.addColorStop(1, '#D89A9F');    // Slight Depth Edge (No dark patches)
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+
+    // Scratch Text Overlay
+    ctx.fillStyle = '#6E2D36';
+    ctx.font = '600 12px "Cinzel", serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('✶ SCRATCH HERE ✶', width / 2, height / 2);
+  }
+
+  setupCanvas();
+
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(() => {
+      if (!scratching && !cleared) setupCanvas();
+    });
+    ro.observe(wrap);
+  }
 
   function scratch(e) {
     if (!scratching || cleared) return;
@@ -98,7 +122,7 @@ function initScratchCard() {
 
     ctx.globalCompositeOperation = 'destination-out';
     ctx.beginPath();
-    ctx.arc(x, y, 22, 0, Math.PI * 2);
+    ctx.arc(x, y, 20, 0, Math.PI * 2);
     ctx.fill();
 
     checkCleared();
@@ -111,7 +135,7 @@ function initScratchCard() {
     for (let i = 3; i < pixelData.length; i += 32) {
       if (pixelData[i] === 0) transparent++;
     }
-    if (transparent / (pixelData.length / 32) > 0.5) {
+    if (transparent / (pixelData.length / 32) > 0.45) {
       cleared = true;
       canvas.style.transition = 'opacity 0.8s ease';
       canvas.style.opacity = '0';
@@ -129,7 +153,6 @@ function initScratchCard() {
     if (scratching) { e.preventDefault(); scratch(e); }
   }, { passive: false });
 }
-
 
 /* ===================================================
    4. COUNTDOWN TIMER
