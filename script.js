@@ -222,3 +222,14 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(tickCountdown, 1000);
   tickCountdown();
 });
+
+/* ===================================================
+   FREEZE HERO VIDEO AT END FRAME
+=================================================== */
+const heroVideo = document.getElementById('hero-bg-video');
+
+if (heroVideo) {
+  heroVideo.addEventListener('ended', function() {
+    heroVideo.pause();
+  });
+}
