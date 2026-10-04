@@ -10,6 +10,7 @@ const EVENT_DATE = new Date("2027-01-29T18:00:00").getTime();
 function initDoorReveal() {
   const doors = document.getElementById('doors');
   const doorVideo = document.getElementById('door-video');
+  const heroVideo = document.getElementById('hero-bg-video');
   const audio = document.getElementById('audio');
 
   if (!doors) return;
@@ -18,33 +19,25 @@ function initDoorReveal() {
 
   function startAudio() {
     if (!audio) return;
-    audio.muted = false; // Ensure unmuted state
-    audio.play().then(() => {
-      const btn = document.getElementById('musicBtn');
-      if (btn) {
-        btn.textContent = '♪';
-        btn.style.opacity = '1';
+    audio.muted = false;
+    audio.play().catch(() => {});
+  }
+
+  function playHeroVideo() {
+    if (heroVideo) {
+      heroVideo.muted = true;
+      heroVideo.currentTime = 0;
+      const promise = heroVideo.play();
+      if (promise !== undefined) {
+        promise.catch(err => console.log("Hero video play error:", err));
       }
-    }).catch(err => {
-      console.log("Audio Direct Play Error:", err);
-    
-      // Try again on the visitor's next tap. click and touchend count as
-      // user gestures for media playback; touchstart does not.
-      const retryAudio = () => {
-        document.removeEventListener('click', retryAudio);
-        document.removeEventListener('touchend', retryAudio);
-        audio.play().catch(() => {});
-      };
-      document.addEventListener('click', retryAudio);
-      document.addEventListener('touchend', retryAudio);
-    });
+    }
   }
 
   function triggerOpen() {
     if (isOpened) return;
     isOpened = true;
 
-    // 1. Immediate Audio Trigger on Direct User Gesture
     startAudio();
 
     const hint = doors.querySelector('.door-overlay');
@@ -54,107 +47,146 @@ function initDoorReveal() {
       doorVideo.muted = true; 
       doorVideo.setAttribute('playsinline', '');
       
-      const playPromise = doorVideo.play();
-      if (playPromise !== undefined) {
-        playPromise.then(() => {
-          const checkSparkleTime = () => {
-            if (doorVideo.currentTime >= 3.8 || doorVideo.ended) {
-              doorVideo.removeEventListener('timeupdate', checkSparkleTime);
-              doors.classList.add('open');
-              setTimeout(() => doors.classList.add('gone'), 1200);
-            }
-          };
-          doorVideo.addEventListener('timeupdate', checkSparkleTime);
-        }).catch(err => {
-          console.log("Video Play Error:", err);
-          doors.classList.add('open');
-          setTimeout(() => doors.classList.add('gone'), 1200);
-        });
-      }
+      doorVideo.play().then(() => {
+        const checkSparkleTime = () => {
+          if (doorVideo.currentTime >= 3.8 || doorVideo.ended) {
+            doorVideo.removeEventListener('timeupdate', checkSparkleTime);
+            doors.classList.add('open');
+            // Jab doors hat jayein, tab hero video fresh play ho
+            playHeroVideo();
+            setTimeout(() => doors.classList.add('gone'), 1200);
+          }
+        };
+        doorVideo.addEventListener('timeupdate', checkSparkleTime);
+      }).catch(() => {
+        doors.classList.add('open');
+        playHeroVideo();
+        setTimeout(() => doors.classList.add('gone'), 1200);
+      });
     } else {
       doors.classList.add('open');
+      playHeroVideo();
       setTimeout(() => doors.classList.add('gone'), 1200);
     }
   }
 
-  // click only: a tap on a phone still fires click. A touchstart listener
-  // would run first, but touchstart is not a user gesture for media, so
-  // audio.play() gets rejected there -- and the isOpened guard then stops
-  // the real click from starting the music.
   doors.addEventListener('click', triggerOpen);
 }
 
 /* ===================================================
-   3. SCRATCH CARD FEATURE
+   HIGH DENSITY GOLD GLITTER SCRATCH CARD (NO WHITE BORDER)
 =================================================== */
 function initScratchCard() {
   const canvas = document.getElementById('scratch');
   if (!canvas) return;
-  const wrap = canvas.parentElement;
-  if (!wrap) return;
-
   const ctx = canvas.getContext('2d');
-  let scratching = false;
-  let cleared = false;
 
-  canvas.width = wrap.offsetWidth || 320;
-  canvas.height = wrap.offsetHeight || 200;
+  const w = canvas.width = 280;
+  const h = canvas.height = 250;
 
-  const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-  gradient.addColorStop(0, '#E8B4B8');
-  gradient.addColorStop(0.5, '#F3D2D5');
-  gradient.addColorStop(1, '#D89A9F');
+  // Exact Symmetrical Plump Heart Path
+  function drawPlumpHeart(c) {
+    c.beginPath();
+    c.moveTo(w / 2, h * 0.82);
+    c.bezierCurveTo(w * 0.08, h * 0.55, w * 0.02, h * 0.16, w * 0.28, h * 0.09);
+    c.bezierCurveTo(w * 0.43, h * 0.04, w / 2, h * 0.22, w / 2, h * 0.22);
+    c.bezierCurveTo(w / 2, h * 0.22, w * 0.57, h * 0.04, w * 0.72, h * 0.09);
+    c.bezierCurveTo(w * 0.98, h * 0.16, w * 0.92, h * 0.55, w / 2, h * 0.82);
+    c.closePath();
+  }
 
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // Draw Rich Gold & Dense Sparkle Glitter
+  function renderGlitterGoldHeart() {
+    ctx.clearRect(0, 0, w, h);
+    ctx.save();
+    
+    drawPlumpHeart(ctx);
+    ctx.clip();
 
-  ctx.fillStyle = '#6E2D36';
-  ctx.font = '600 13px "Cinzel", serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('✶ SCRATCH HERE ✶', canvas.width / 2, canvas.height / 2);
+    // Warm Rich Metallic Gold Base Gradient
+    const goldGrad = ctx.createLinearGradient(0, 0, w, h);
+    goldGrad.addColorStop(0, '#EBD28B');   /* Bright Gold Highlight */
+    goldGrad.addColorStop(0.3, '#C29841');  /* Main Warm Gold */
+    goldGrad.addColorStop(0.7, '#A3792C');  /* Deep Gold Shadow */
+    goldGrad.addColorStop(1, '#7C581A');    /* Rich Gold Edge Accent */
 
-  function scratch(e) {
-    if (!scratching || cleared) return;
+    ctx.fillStyle = goldGrad;
+    ctx.fillRect(0, 0, w, h);
+
+    // Dense Multi-Sized Glitter Particles (1200+ Sparkles)
+    for (let i = 0; i < 1200; i++) {
+      const rx = Math.random() * w;
+      const ry = Math.random() * h;
+      const size = Math.random() * 2.2;
+      const opacity = Math.random() * 0.95;
+      
+      // Random Gold & Bright White Sparkles Mix
+      const randColor = Math.random();
+      if (randColor > 0.6) {
+        ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+      } else if (randColor > 0.3) {
+        ctx.fillStyle = `rgba(255, 243, 176, ${opacity})`;
+      } else {
+        ctx.fillStyle = `rgba(255, 215, 0, ${opacity})`;
+      }
+
+      ctx.beginPath();
+      ctx.arc(rx, ry, size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    
+    ctx.restore();
+  }
+
+  renderGlitterGoldHeart();
+
+  // Smooth Scratch Interaction
+  let isScratching = false;
+
+  function getPos(e) {
     const rect = canvas.getBoundingClientRect();
-    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: (clientX - rect.left) * (w / rect.width),
+      y: (clientY - rect.top) * (h / rect.height)
+    };
+  }
 
+  function doScratch(e) {
+    if (!isScratching) return;
+    const pos = getPos(e);
+    
     ctx.globalCompositeOperation = 'destination-out';
     ctx.beginPath();
-    ctx.arc(x, y, 22, 0, Math.PI * 2);
+    ctx.arc(pos.x, pos.y, 22, 0, Math.PI * 2);
     ctx.fill();
-
-    checkCleared();
   }
 
-  function checkCleared() {
-    if (cleared) return;
-    const pixelData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-    let transparent = 0;
-    for (let i = 3; i < pixelData.length; i += 32) {
-      if (pixelData[i] === 0) transparent++;
-    }
-    if (transparent / (pixelData.length / 32) > 0.5) {
-      cleared = true;
-      canvas.style.transition = 'opacity 0.8s ease';
-      canvas.style.opacity = '0';
-      setTimeout(() => (canvas.style.pointerEvents = 'none'), 800);
-    }
+  function startScratch(e) {
+    isScratching = true;
+    doScratch(e);
   }
 
-  canvas.addEventListener('mousedown', (e) => { scratching = true; scratch(e); });
-  window.addEventListener('mouseup', () => (scratching = false));
-  canvas.addEventListener('mousemove', scratch);
+  function stopScratch() {
+    isScratching = false;
+  }
 
-  canvas.addEventListener('touchstart', (e) => { scratching = true; scratch(e); }, { passive: true });
-  window.addEventListener('touchend', () => (scratching = false));
-  canvas.addEventListener('touchmove', (e) => {
-    if (scratching) { e.preventDefault(); scratch(e); }
+  canvas.addEventListener('mousedown', startScratch);
+  canvas.addEventListener('mousemove', doScratch);
+  window.addEventListener('mouseup', stopScratch);
+
+  canvas.addEventListener('touchstart', (e) => { startScratch(e); }, { passive: true });
+  canvas.addEventListener('touchmove', (e) => { 
+    if (isScratching) {
+      e.preventDefault(); 
+      doScratch(e); 
+    }
   }, { passive: false });
+  window.addEventListener('touchend', stopScratch);
 }
 
-
+document.addEventListener('DOMContentLoaded', initScratchCard);
 /* ===================================================
    4. COUNTDOWN TIMER
 =================================================== */
@@ -223,13 +255,3 @@ document.addEventListener('DOMContentLoaded', () => {
   tickCountdown();
 });
 
-/* ===================================================
-   FREEZE HERO VIDEO AT END FRAME
-=================================================== */
-const heroVideo = document.getElementById('hero-bg-video');
-
-if (heroVideo) {
-  heroVideo.addEventListener('ended', function() {
-    heroVideo.pause();
-  });
-}
